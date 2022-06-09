@@ -130,7 +130,7 @@ clock_stretch_stop:
 
 
 // Write a bit to I2C bus
-i2c_write_bit://artificially creating a clock it looks like
+i2c_write_bit://artificially creating a clock, it appears like
 	jumpr bit0,1,lt
 	set_SDA
 	jump bit1
@@ -187,7 +187,7 @@ clock_stretch_read:
 i2c_write_byte:
 	stage_rst //set to 0
 next_bit:
-	and r0,r2,0x80 // he is writing one bit at at time starting with the 7th bit then shifting it left on line 193
+	and r0,r2,0x80 // he is writing one bit at at time starting with the 7th bit (leftmost) then shifting it left on line 193
 	psr
 	jump i2c_write_bit// 132 of this file
 	lsh r2,r2,1

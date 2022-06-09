@@ -14,13 +14,13 @@ write_intro:
 	psr
 	jump i2c_start_cond
 
-	ld r2,r3,20 // Address
-	lsh r2,r2,1
+	ld r2,r3,20 // Address (param1)
+	lsh r2,r2,1 //add 0 to the rightmost to indicate write
 	psr
 	jump i2c_write_byte
 	jumpr popfail,1,ge
 
-	ld r2,r3,16 // Register
+	ld r2,r3,16 // Register (param2)
 	psr
 	jump i2c_write_byte
 	jumpr popfail,1,ge
@@ -42,7 +42,7 @@ write_b:
 	jump i2c_stop_cond
 
 	move r2,0 // Ok
-	ret
+	ret //if i came from write 8, where do i return to?
 
 
 .global write16

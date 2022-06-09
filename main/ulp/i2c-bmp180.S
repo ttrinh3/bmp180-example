@@ -61,7 +61,9 @@ didInit:
 	push r1
 	psr
 	jump write8
-	add r3,r3,3 // remove 3 arguments from stack
+	add r3,r3,3 // remove 3 arguments from stack why? he only uses 2 parameters in following write8
+				//nvm the last parameter is used in write_b
+
 	move r0,r2 // test for error in r2
 	jumpr fail,1,ge
 
@@ -153,7 +155,7 @@ fail:
 initBMP:
 	move r1,ac1
 	push r1
-	move r1,BMP180_ADDR//how is this the 4th item
+	move r1,BMP180_ADDR//how is this =16 on the stack
 	push r1
 	move r1,BMP085_CAL_AC1
 	push r1
