@@ -114,7 +114,7 @@ fail:
 .global read16
 read16:
 	psr
-	jump read_intro //look up. it does  the start condition, address, register and 
+	jump read_intro //look up in this file. it does  the start condition, address, register and 
 
 	move r2,0
 	psr

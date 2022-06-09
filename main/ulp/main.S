@@ -30,22 +30,23 @@ stackEnd:
 	/* Code goes into .text section */
 	.text
 	.global entry
-entry:
-	move r3,stackEnd
+entry: //code begins here
+	move r3,stackEnd //r3 has ADDRESS of stack end
 
 	// Read the BMP-180 every 4 timer cycles:
-	move r1,counter
-	ld r0,r1,0 //load r0 with the value of counter
-	add r0,r0,1 
-	st r0,r1,0 // increment counter
-	and r0,r0,0x3 //continue the code anytime it's 0
-	jumpr waitNext,1,ge 
+	move r1,counter //r1 has ADDRESS of counter
+	ld r0,r1,0 //load r0 with the VALUE of counter
+	add r0,r0,1 //add 1 (increment)
+	st r0,r1,0 // put back in counter
+	and r0,r0,0x3 //check the relevant bits
+	jumpr waitNext,1,ge //continue the code anytime it's 0, else you halt, which pauses until next cycle
 
 	// GPIO2 LED ON
-	//GPIO 2 corresponds to rtc gpio 12
+	//GPIO 2 corresponds to rtc gpio 12. (notice the +12 offset)
 	WRITE_RTC_REG(RTC_GPIO_OUT_REG, RTC_GPIO_OUT_DATA_S + 12, 1, 1)
 
 	//you need to call psr before subroutines
+	//difference between subroutine and label is the existence of ret (return). psr and ret are defined in stack.S
 	//go to file bmp180.S
 	psr
 	jump readBMP //bmp file line 51

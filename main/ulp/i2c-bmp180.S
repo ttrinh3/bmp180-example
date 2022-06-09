@@ -50,7 +50,7 @@ md: .long 0
 .global readBMP 
 readBMP:
 	move r1,ac1 //ac1 is a calibration value from the datasheet
-	ld r0,r1,0 //r1 previous had an address since ac1 is a label, so now r0 has the actual ac1 value
+	ld r0,r1,0 //r1 previous had an address since ac1 is a label, so now r0 has the actual ac1 value which is 0
 	jumpr initBMP,1,lt //it's 0 initially so jump to 153 of this file
 didInit:
 	move r1,BMP180_ADDR
