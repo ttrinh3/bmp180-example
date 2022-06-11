@@ -49,7 +49,7 @@ md: .long 0
 
 .global readBMP 
 readBMP:
-	move r1,ac1 //ac1 is a calibration value from the datasheet
+	move r1,ac1 //ac1 is a calibration value from the datasheet p13
 	ld r0,r1,0 //r1 previous had an address since ac1 is a label, so now r0 has the actual ac1 value which is 0
 	jumpr initBMP,1,lt //it's 0 initially so jump to 153 of this file
 didInit:
@@ -61,8 +61,8 @@ didInit:
 	push r1
 	psr
 	jump write8
-	add r3,r3,3 // remove 3 arguments from stack why? he only uses 2 parameters in following write8
-				//nvm the last parameter is used in write_b
+	add r3,r3,3 // remove 3 arguments from stack as all three were written
+	
 
 	move r0,r2 // test for error in r2
 	jumpr fail,1,ge
@@ -72,13 +72,13 @@ didInit:
 	psr
 	jump waitMs
 
-	// Read 16 bit result
+	// Read 16 bit result (now that we have previously issued commands)
 	move r1,BMP180_ADDR
 	push r1
 	move r1,BMP180_REG_RESULT
 	push r1
 	psr
-	jump read16
+	jump read16 //reads two bytes (uses 2 parameters from stack)
 	add r3,r3,2 // remove call parameters from stack
 	move r1,r0 // save result
 	move r0,r2 // test for error
@@ -130,7 +130,7 @@ didInit:
 	move r2,pressure2 // store result
 	st r1,r2,0
 
-	ret //go back to line 51 of main
+	ret //go back to line 51 of main (read bmp)
 
 fail:
 	move r1,temp
@@ -167,16 +167,15 @@ read_cal:
 	jump fail
 readok:
 	ld r1,r3,12 // this is likely cal_ac1 from line 158 on this file
-	st r0,r1,0 //put the read bytes in cal?
-	add r1,r1,1 //add 1 to cal?
-	st r1,r3,12 // next cal parameter address. store it in stack?
-	ld r0,r3,4 //retrieve something from stack
-	add r0,r0,2 // next register
-	st r0,r3,4 //increment it and put it back
+	st r0,r1,0 
+	add r1,r1,1 
+	st r1,r3,12 
+	ld r0,r3,4 
+	add r0,r0,2 
+	st r0,r3,4 
 	jumpr read_cal,BMP085_CAL_MD+2,lt
 	add r3,r3,3
-	jump didInit //why didn't he call psr? didInit is a subroutine becasue it has a return
-	//and why are we jumping here again?
+	jump didInit 
 
 // Wait for r2 milliseconds
 waitMs:
@@ -185,4 +184,4 @@ waitMs:
 	jump doneWaitMs,eq
 	jump waitMs
 doneWaitMs:
-	ret
+	ret //return to whoever called initBMP (bmp180 line 54)
