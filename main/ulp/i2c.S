@@ -196,7 +196,7 @@ next_bit:
 
 	psr
 	jump i2c_read_bit //165 of this
-	ret // nack, back to util 69
+	ret //back to 56
 
 
 // Read a byte from I2C bus
