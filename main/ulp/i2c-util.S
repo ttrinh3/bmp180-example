@@ -12,37 +12,37 @@
 
 write_intro:
 	psr
-	jump i2c_start_cond
+	jump i2c_start_cond //Start command
 
 	ld r2,r3,20 // Address (param1)
 	lsh r2,r2,1 //add 0 to the rightmost to indicate write
 	psr
-	jump i2c_write_byte
+	jump i2c_write_byte //write the address
 	jumpr popfail,1,ge
 
-	ld r2,r3,16 // Register (param2)
+	ld r2,r3,16 // after address write the register
 	psr
 	jump i2c_write_byte
 	jumpr popfail,1,ge
-	ret
+	ret //back to 51 of util or 33
 
 
 .global write8
 write8:
 	psr
-	jump write_intro
+	jump write_intro //this uses 2 parameters from the stack: address and register
 
 write_b:
-	ld r2,r3,8 // data byte
+	ld r2,r3,8 //  probably the command register on the stack (3rd parameter used)
 	psr
 	jump i2c_write_byte
 	jumpr fail,1,ge
 
 	psr
-	jump i2c_stop_cond
+	jump i2c_stop_cond //issues stop cond
 
 	move r2,0 // Ok
-	ret //if i came from write 8, where do i return to?
+	ret //return to didInit (bmp180) (63)
 
 
 .global write16
@@ -58,7 +58,7 @@ write16:
 
 	jump write_b
 
-
+//after write then read
 read_intro: //note that r2 is used to contain the content to write to the sensor
 	psr
 	jump i2c_start_cond//go to i2c.s
