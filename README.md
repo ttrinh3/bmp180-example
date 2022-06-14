@@ -1,40 +1,50 @@
-# ULP I2C demo application
+# ULP Process
 
-Example of ESP-32 ULP I2C application which reads a sensor (BMP-180) and wakes up the main processors after a significant change
-of the measured values.
+## 1. Entry
+-initialize stack
+-create loop that reads at the 4th cycle (jump to waitNext 3/4 times)
+-turns on GPIO2 but this is not necessary for our project
 
-Note that the ULP is quite limited in program size and IO options.
-An alternative is to use an ATTiny as ULP processor, see:
+## 2. readBMP
+- does something with the calibration values that will not be applicable to bme680
 
-https://github.com/tomtor/ESPTiny
+## 3. didInit
+- put 1. slave addr, 2. register addr, 3. command on stack
+- write these using write8
 
-## IDF requirements
-Tested on IDF 4.1 with CMake build system
+### write8
+- write_intro intitiates the communication with START COMMAND
+- follows up by writing slave_addr (7bit slave_addr + 0 bit to indicate write) using write_byte
+- follows up writing register write_byte
 
-## I2C bit banged support
-Note that this example uses a bit-banged I2C implementation, because the hardware ULP I2C support cannot read 16 bit values.
-This is not essential for the BMP-180, but some sensors like the ADS-1015 **DO** require 16-bit readouts.
+### write_b
+- writes the command using write_byte
+- issues stop command (at this point 3 parameters that were on the stack are used)
 
-## Example of Macro usage and ULP stack/subroutines
-In additon this example shows ULP stack handling and reusable subroutines examples, like
+## 3. Back to didInit
+- remove the 3 parameters that were all used in the subroutines
 
-### waitMs
+- push slave address and reg_result (after writing command this register contains a word representing temperature). It's on the datasheet p.22 if you don't believe me
 
-Wait some milliseconds
+- read16 reads 2bytes because the temperature is contained by a word
 
-### abs
-Compute abs value of register
+- remove 2 parameters that were pushed to the stack
 
-## Credits
-Parts of the original C code from
+- at this point r0 probably contains the word and is stored in r1
 
-https://github.com/adafruit/Adafruit-BMP085-Library
+- put that result in temp
 
-were translated to ESP assembly.
+- repeat the process for reading pressure
 
-## Warning
+## 4. Entry
+- compares new pressure with the prev_pressure 
+- if not enough change then check temperature difference else wakeup
+- if temp difference not enough wait for next cycle else wakeup
 
-Be aware of an assembler bug:
+## 5. wakeUp
 
-https://www.esp32.com/viewtopic.php?f=2&t=3228
- 
+- saves new pressure and temperature
+- disables ULP and wakes up system
+
+
+
