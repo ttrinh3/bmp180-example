@@ -73,7 +73,7 @@ testTemp:
 	sub r0,r0,r2 //find the difference
 	psr
 	jump abs //this just deals with negatives
-	jumpr waitNext,10,lt //if difference is not big enough then halt. what?
+	jumpr waitNext,10,lt //if difference is not big enough then halt. 
 
 wakeUp:
 	/* save new pressure and temp */

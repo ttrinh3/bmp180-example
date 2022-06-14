@@ -122,7 +122,7 @@ didInit:
 	move r1,(BMP180_REG_RESULT+2)
 	push r1
 	psr
-	jump read8
+	jump read8 
 	add r3,r3,2 // remove call parameters from stack
 	move r1,r0 // save result
 	move r0,r2 // test for error
